@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.zerock.springboot.domain.Board;
+import org.zerock.springboot.repository.BoardRepository;
 
 
 import java.util.List;
@@ -49,13 +50,13 @@ public class BoardRepositoryTests {
 
     @Test
     public void testUpdate(){
-        Long bno = 100L;
+        Long bno = 99L;
 
         Optional<Board> result = boardRepository.findById(bno);
 
         Board board = result.orElseThrow();
 
-        board.change("update...title 100", "update content 100");
+        board.change("update...title 99", "update content 99");
 
         boardRepository.save(board);
     }
@@ -85,5 +86,37 @@ public class BoardRepositoryTests {
         todoList.forEach(board -> log.info(board));
     }
 
+    @Test
+    public void testSearch1(){
 
+        //2 page order by bno desc
+        Pageable pageable = PageRequest.of(1,10,Sort.by("bno").descending());
+
+        boardRepository.search1(pageable);
+    }
+
+    @Test
+    public void testSearchAll2(){
+
+        String[] types = {"t","c","w"};
+
+        String keyword = "1";
+
+        Pageable pageable = PageRequest.of(0,10,Sort.by("bno").descending());
+
+        Page<Board> result = boardRepository.searchAll(types, keyword, pageable);
+
+        log.info(result.getTotalPages());
+
+        //pag size
+        log.info(result.getSize());
+
+        //pageNumber
+        log.info(result.getNumber());
+
+        //prev next
+        log.info(result.hasPrevious() + ": " + result.hasNext());
+
+        result.getContent().forEach(board -> log.info(board));
+    }
 }
